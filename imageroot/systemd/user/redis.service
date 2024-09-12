@@ -4,7 +4,7 @@
 #
 
 [Unit]
-Description=Podman  mixpost-app.service
+Description=Podman  redis.service
 BindsTo=mixpost.service
 After=mixpost.service mariadb-app.service
 
@@ -16,18 +16,18 @@ WorkingDirectory=%S/state
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/mkdir -p tmp
-ExecStartPre=/bin/rm -f %t/mixpost-app.pid %t/mixpost-app.ctr-id
+ExecStartPre=/bin/rm -f %t/redis.pid %t/redis.ctr-id
 ExecStartPre=-runagent discover-smarthost
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/mixpost-app.pid \
-    --cidfile %t/mixpost-app.ctr-id --cgroups=no-conmon \
-    --pod-id-file %t/mixpost.pod-id --replace -d --name  mixpost-app \
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/redis.pid \
+    --cidfile %t/redis.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/mixpost.pod-id --replace -d --name  redis \
     --volume redis:/data \
     ${REDIS_IMAGE} redis-server --appendonly yes --replica-read-only no
-ExecStop=/usr/bin/podman stop --ignore --cidfile %t/mixpost-app.ctr-id -t 10
-ExecReload=/usr/bin/podman kill -s HUP mixpost-app
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/redis.ctr-id -t 10
+ExecReload=/usr/bin/podman kill -s HUP redis
 SyslogIdentifier=%u
-ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/mixpost-app.ctr-id
-PIDFile=%t/mixpost-app.pid
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/redis.ctr-id
+PIDFile=%t/redis.pid
 Type=forking
 
 [Install]
