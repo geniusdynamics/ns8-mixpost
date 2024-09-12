@@ -36,6 +36,20 @@ mariadb_config = {
 
 agent.write_envfile("database.env", mariadb_config)
 
+# Generate base64 like base64:PIrmlUsSBDH89CELqbIhJP9jhqhADGSttMOPhUPpunA=
+def generate_base64_app_key():
+    return "base64:" + generate_random_password(32)
+
+APP_KEY = generate_base64_app_key()
+
+app_config = {
+    "APP_KEY": APP_KEY,
+    "DB_DATABASE": MARIADB_DATABASE,
+    "DB_USERNAME": MARIADB_USER,
+    "DB_PASSWORD": MARIADB_PASSWORD
+}
+agent.write_envfile("app-db.env", app_config)
+
 
 # just before starting systemd unit
 #agent.dump_env()
