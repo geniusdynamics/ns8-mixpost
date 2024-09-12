@@ -6,7 +6,7 @@
 [Unit]
 Description=Podman mariadb-app.service
 BindsTo=mixpost.service
-After=mixpost.service
+After=mixpost.service redis.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
