@@ -13,20 +13,33 @@ import agent
 # If parsing fails, output everything to stderr
 data = json.load(sys.stdin)
 
-#This is specific to you module, so you need to change it accordingly.
-# we read a json stdin {"vars1":true, "var2":"foo", "vars3": 3} and we writ it to .config/state/environment
-# Upper case to set environment variable and minor case to read from stdin
+# # The name of your application.
+# APP_NAME=Mixpost
+#
+# # Key used to encrypt and decrypt sensitive data. Generate this using the following tool:
+# # https://mixpost.app/tools/encryption-key-generator
+# APP_KEY=
+#
+# # Debug mode setting. Set to `false` for production environments.
+# APP_DEBUG=false
+#
+# # Your app's domain or subdomain, without the 'http://' or 'https://' prefix.
+# APP_DOMAIN=example.com
+#
+# # Full application URL is automatically configured; no modification required.
+# APP_URL=https://${APP_DOMAIN}
+APP_NAME = data.get('APP_NAME', 'Mixpost')
+APP_DEBUG = data.get('APP_DEBUG', 'false')
+APP_DOMAIN = data.get('host')
+APP_URL = f"https://{APP_DOMAIN}"
 
-# this values must exists in the json stdin
-# agent.set_env("MAIL_SERVER", data["mail_server"])
-# agent.set_env("LDAP_DOMAIN", data["ldap_domain"])
-
-# you can add default values for the following variables
-# agent.set_env("MAIL_DOMAIN",data.get("mail_domain",""))
-# agent.set_env("WOWORKERSCOUNT",data.get("workers_count",3))
-# agent.set_env("AUXILIARYACCOUNT",data.get("auxiliary_account",True))
-# agent.set_env("ACTIVESYNC",data.get("activesync",False))
-
+app_env = {
+    'APP_NAME': APP_NAME,
+    'APP_DEBUG': APP_DEBUG,
+    'APP_DOMAIN': APP_DOMAIN,
+    'APP_URL': APP_URL,
+}
+agent.write_envfile("mixpost-app.env", app_env)
 
 # Make sure everything is saved inside the environment file
 # just before starting systemd unit
