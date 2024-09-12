@@ -1,0 +1,34 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman  mixpost-app.service
+BindsTo=mixpost.service
+After=mixpost.service mariadb-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+EnvironmentFile=-%S/state/smarthost.env
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/mkdir -p tmp
+ExecStartPre=/bin/rm -f %t/mixpost-app.pid %t/mixpost-app.ctr-id
+ExecStartPre=-runagent discover-smarthost
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/mixpost-app.pid \
+    --cidfile %t/mixpost-app.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/mixpost.pod-id --replace -d --name  mixpost-app \
+    --volume redis:/data \
+    ${REDIS_IMAGE} redis-server --appendonly yes --replica-read-only no
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/mixpost-app.ctr-id -t 10
+ExecReload=/usr/bin/podman kill -s HUP mixpost-app
+SyslogIdentifier=%u
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/mixpost-app.ctr-id
+PIDFile=%t/mixpost-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
