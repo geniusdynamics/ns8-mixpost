@@ -10,8 +10,8 @@
 
 [Unit]
 Description=Podman mixpost.service
-Requires=mariadb-app.service mixpost-app.service
-Before=mariadb-app.service mixpost-app.service
+Requires=redis.service mariadb-app.service mixpost-app.service
+Before=redis.service mariadb-app.service mixpost-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
