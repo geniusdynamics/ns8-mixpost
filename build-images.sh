@@ -14,6 +14,16 @@ images=()
 repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
 reponame="mixpost"
+# Node.js 25+ no longer ships Corepack, install it from npm
+# renovate: datasource=npm packageName=corepack
+corepack_version=0.36.0
+# Upstream images, see https://docs.mixpost.app/lite/installation/docker
+# renovate: datasource=docker depName=inovector/mixpost
+mixpost_image="docker.io/inovector/mixpost:v2.6.0"
+# renovate: datasource=docker depName=mariadb
+mariadb_image="docker.io/mariadb:11.4.13"
+# renovate: datasource=docker depName=redis
+redis_image="docker.io/redis:8.10.3"
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -21,7 +31,8 @@ container=$(buildah from scratch)
 # Reuse existing nodebuilder-mixpost container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-mixpost; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-mixpost -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+    buildah from --name nodebuilder-mixpost -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
+    buildah run nodebuilder-mixpost sh -c "npm install -g corepack@${corepack_version} && corepack enable"
 fi
 
 echo "Build static UI files with node..."
@@ -34,18 +45,13 @@ buildah run \
 # Add imageroot directory to the container image
 buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
-# Setup the entrypoint, ask to reserve one TCP port with the label and set a rootless container
-# Select you image(s) with the label org.nethserver.images
-# ghcr.io/xxxxx is the GitHub container registry or your own registry or docker.io for Docker Hub
-# The image tag is set to latest by default, but can be overridden with the IMAGETAG environment variable
-# --label="org.nethserver.images=docker.io/mariadb:10.11.5 docker.io/roundcube/roundcubemail:1.6.4-apache"
-# rootfull=0 === rootless container
-# tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
+# Setup the entrypoint, reserve one TCP port (web UI) and set a rootless container
 buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/mariadb:10.11.5 docker.io/inovector/mixpost:latest docker.io/redis:latest" \
+    --label="org.nethserver.min-core=3.12.4-0" \
+    --label="org.nethserver.images=${mixpost_image} ${mariadb_image} ${redis_image}" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
