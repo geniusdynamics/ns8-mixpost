@@ -1,19 +1,22 @@
 {
   "name": "mixpost",
   "description": {
-    "en": "My mixpost module"
+    "en": "Self-hosted social media management tool to schedule posts, manage accounts and review their statistics.",
+    "it": "Strumento self-hosted per programmare post sui social, gestire gli account e consultarne le statistiche."
   },
-  "categories": [],
+  "categories": [
+    "web"
+  ],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Genius Dynamics",
+      "email": "support@genius.ke"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.mixpost.com/",
-    "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-mixpost"
+    "documentation_url": "https://docs.mixpost.app",
+    "bug_url": "https://github.com/geniusdynamics/ns8-mixpost/issues",
+    "code_url": "https://github.com/geniusdynamics/ns8-mixpost"
   },
-  "source": "ghcr.io/nethserver/mixpost"
+  "source": "ghcr.io/geniusdynamics/mixpost"
 }
