@@ -2,7 +2,7 @@
   "name": "mixpost",
   "description": {
     "en": "Self-hosted social media management tool to schedule posts, manage accounts and review their statistics.",
-    "it": "Strumento self-hosted per programmare post sui social, gestire gli account e consultarne le statistiche."
+    "it": "Mixpost è uno strumento self-hosted per pianificare e pubblicare contenuti sui social."
   },
   "categories": [
     "web"
