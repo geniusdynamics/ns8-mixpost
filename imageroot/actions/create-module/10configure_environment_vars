@@ -38,12 +38,19 @@ agent.write_envfile("database.env", mariadb_config)
 
 # Generate base64 like base64:PIrmlUsSBDH89CELqbIhJP9jhqhADGSttMOPhUPpunA=
 def generate_base64_app_key():
-    return "base64:" + generate_random_password(32)
+    # Laravel needs base64 of exactly 32 random bytes for AES-256
+    import base64
+    return "base64:" + base64.b64encode(os.urandom(32)).decode()
 
 APP_KEY = generate_base64_app_key()
 
 app_config = {
     "APP_KEY": APP_KEY,
+    # all the containers share the pod network
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "3306",
+    "REDIS_HOST": "127.0.0.1",
+    "REDIS_PORT": "6379",
     "DB_DATABASE": MARIADB_DATABASE,
     "DB_USERNAME": MARIADB_USER,
     "DB_PASSWORD": MARIADB_PASSWORD
