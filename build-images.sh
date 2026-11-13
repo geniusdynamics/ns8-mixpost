@@ -21,7 +21,7 @@ corepack_version=0.36.0
 # renovate: datasource=docker depName=inovector/mixpost
 mixpost_image="docker.io/inovector/mixpost:v2.6.0"
 # renovate: datasource=docker depName=mariadb
-mariadb_image="docker.io/mariadb:11.8.9"
+mariadb_image="docker.io/mariadb:13.0.2"
 # renovate: datasource=docker depName=redis
 redis_image="docker.io/redis:8.10.3"
 
